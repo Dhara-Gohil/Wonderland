@@ -1,2 +1,3 @@
-# Wonderland
-A sleek Airbnb clone for seamless property booking and listing with a user-friendly design. Built for efficiency, accessibility, and a smooth user experience.
+# Wonderland / Airbnb Clone
+
+A sleek and responsive Airbnb clone that allows users to seamlessly book and list properties. Designed with efficiency and accessibility in mind for an exceptional user experience.
