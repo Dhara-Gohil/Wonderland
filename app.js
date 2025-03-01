@@ -7,7 +7,9 @@ const ejsMate = require("ejs-mate");
 const Listing = require("./models/listing");
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js");
-const {listingSchema} = require("./schema.js");
+const {listingSchema,reviewSchema} = require("./schema.js");
+const Review = require("./models/review");
+
 
 const app = express();
 const mongo_url = "mongodb://127.0.0.1:27017/wonderland";
@@ -52,6 +54,17 @@ const validatelisting = (req,res,next)=>{
     }
 }
 
+const validateReview = (req,res,next)=>{
+    let {error} = reviewSchema.validate(req.body);
+    // console.log(result);
+    if(error){
+        let errMsg = error.details.map((el)=>el.message).join(",");
+        throw new ExpressError(400,errMsg);
+    }else {
+        next();
+    }
+}
+
 // Index route: List all listings
 app.get("/listings",wrapAsync ( async (req, res) => {
     const allListings = await Listing.find({});
@@ -87,7 +100,7 @@ app.post("/listings", validatelisting , wrapAsync ( async (req, res) => { // Che
 // Show route: View a specific listing
 app.get("/listings/:id", wrapAsync( async (req, res) => {
     const { id } = req.params;
-    const listing = await Listing.findById(id);
+    const listing = await Listing.findById(id).populate("reviews");
     res.render("listings/show", { listing });
 }));
 
@@ -135,6 +148,31 @@ app.delete("/listings/:id" , wrapAsync ( async(req,res)=>{
     res.redirect("/listings");
 }));
 
+// for Reviews
+//post review route
+app.post("/listings/:id/review", validateReview ,wrapAsync( async(req,res)=>{
+    let listing = await Listing.findById(req.params.id);
+    let newReview = new Review(req.body.review);
+
+    listing.reviews.push(newReview);
+
+    await newReview.save();
+    await listing.save();
+
+    res.redirect(`/listings/${listing._id}`)
+}))
+
+//delete review route
+app.delete("/listings/:id/reviews/:reviewId",
+    wrapAsync( async ( req, res)=>{
+        let {id ,reviewId} = req.params;
+
+        await Listing.findByIdAndUpdate(id , {$pull : {reviews:reviewId}});
+        await Review.findByIdAndDelete(reviewId);
+
+        res.redirect(`/listings/${id}`);
+    }))
+ 
 
 // for error handling 
 

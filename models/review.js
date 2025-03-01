@@ -4,9 +4,11 @@ const { string, number } = require("joi");
 const Schema = mongoose.Schema;
 
 const reviewSchema = new Schema({
-    comment : string,
+    comment : {
+        type : String,
+    },
     rating : {
-        type : number,
+        type : Number,
         min : 1,
         max : 5,
     },
