@@ -1,3 +1,4 @@
+const { object } = require("joi");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema; // class ; creating schema
 
@@ -23,6 +24,12 @@ price: {
   },
   location: String,
   country: String,
+  reviews : [
+    {
+      type : Schema.Types.ObjectId,
+      ref : "Review",
+    }
+  ]
 });
 
 
