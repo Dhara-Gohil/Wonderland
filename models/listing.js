@@ -1,7 +1,7 @@
 const { object } = require("joi");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema; // class ; creating schema
-const Review = require("./review");
+
 
 const listingschema = new Schema({ // object ; creating model
   title: {
@@ -32,6 +32,8 @@ price: {
     }
   ]
 });
+
+const Review = require("./review");
 
 listingschema.post("findOneAndDelete", async (listing)=>{
   if(listing){
