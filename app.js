@@ -1,17 +1,15 @@
-
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
-const Listing = require("./models/listing");
-const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js");
-const {listingSchema,reviewSchema} = require("./schema.js");
-const Review = require("./models/review");
 const app = express();
 
 const listings = require("./routes/listings.js");
+const reviews = require("./routes/review.js");
+
+
 const mongo_url = "mongodb://127.0.0.1:27017/wonderland";
 
 // Database connection
@@ -21,6 +19,7 @@ async function main() {
 }
 
 main().catch((err) => console.error(err));
+
 
 // Start the server
 app.listen(8080, () => {
@@ -43,48 +42,11 @@ app.get("/", (req, res) => {
 });
 
 
-
-const validateReview = (req,res,next)=>{
-    let {error} = reviewSchema.validate(req.body);
-    // console.log(result);
-    if(error){
-        let errMsg = error.details.map((el)=>el.message).join(",");
-        throw new ExpressError(400,errMsg);
-    }else {
-        next();
-    }
-}
-
 app.use("/listings", listings);  
-
-// for Reviews
-//post review route
-app.post("/listings/:id/review", validateReview ,wrapAsync( async(req,res)=>{
-    let listing = await Listing.findById(req.params.id);
-    let newReview = new Review(req.body.review);
-
-    listing.reviews.push(newReview);
-
-    await newReview.save();
-    await listing.save();
-
-    res.redirect(`/listings/${listing._id}`)
-}))
-
-//delete review route
-app.delete("/listings/:id/reviews/:reviewId",
-    wrapAsync( async ( req, res)=>{
-        let {id ,reviewId} = req.params;
-
-        await Listing.findByIdAndUpdate(id , {$pull : {reviews:reviewId}});
-        await Review.findByIdAndDelete(reviewId);
-
-        res.redirect(`/listings/${id}`);
-    }))
+app.use("/listings/:id/reviews", reviews);
  
 
 // for error handling 
-
 app.all("*",(read,res,next)=>{
     next(new ExpressError(404,"page not found!"));
 });
