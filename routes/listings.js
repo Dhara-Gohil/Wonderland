@@ -4,6 +4,7 @@ const wrapAsync = require("../utils/wrapAsync.js");
 const ExpressError = require("../utils/ExpressError.js");  
 const {listingSchema} = require("../schema.js");
 const Listing = require("../models/listing");
+const {isLoggedIn} = require("../middleware.js");
 
 
 // function for validatejoi
@@ -29,7 +30,7 @@ router.get("/",wrapAsync ( async (req, res) => {
 
 
 // New listing form route
-router.get("/new", (req, res) => {
+router.get("/new", isLoggedIn, (req, res) => {
     res.render("listings/new");
 });
 
@@ -49,7 +50,7 @@ router.get("/:id", wrapAsync( async (req, res) => {
 
 
 // Create listing route
-router.post("/", validatelisting , wrapAsync ( async (req, res) => { // Check the incoming data and log it
+router.post("/", isLoggedIn,validatelisting , wrapAsync ( async (req, res) => { // Check the incoming data and log it
     console.log("Received listing data:", req.body.listing);// Destructure the incoming data
     const { title, description, image, price, location, country } = req.body.listing; 
     const finalImage = (image && typeof image === 'string' && image.trim() !== '') ? image : undefined; // If image is an empty string, use the default image URL
@@ -76,7 +77,7 @@ router.post("/", validatelisting , wrapAsync ( async (req, res) => { // Check th
 //     res.render("listings/edit", { listing });
 // });
 
-router.get("/:id/edit", wrapAsync ( async (req, res) => {
+router.get("/:id/edit", isLoggedIn, wrapAsync ( async (req, res) => {
     const { id } = req.params;
         const listing = await Listing.findById(id);
         if (!listing) {
@@ -100,7 +101,7 @@ router.get("/:id/edit", wrapAsync ( async (req, res) => {
 //     }
 // });
 
-router.put("/:id", validatelisting, wrapAsync ( async (req, res) => {
+router.put("/:id", isLoggedIn ,validatelisting, wrapAsync ( async (req, res) => {
     const { id } = req.params;
         const updatedListing = await Listing.findByIdAndUpdate(id, req.body.listing, { new: true });
         if (!updatedListing) {
@@ -114,7 +115,7 @@ router.put("/:id", validatelisting, wrapAsync ( async (req, res) => {
 
 
 // Delete route
-router.delete("/:id" , wrapAsync ( async(req,res)=>{
+router.delete("/:id" , isLoggedIn ,wrapAsync ( async(req,res)=>{
     let {id}= req.params;
     let deletedlisting = await Listing.findByIdAndDelete(id);
     console.log(deletedlisting);
