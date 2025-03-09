@@ -7,10 +7,13 @@ const ExpressError = require("./utils/ExpressError.js");
 const app = express();
 const session = require("express-session");
 const flash = require("connect-flash");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const User = require("./models/user.js");
 
-const listings = require("./routes/listings.js");
-const reviews = require("./routes/review.js");
-const { cookie } = require("express/lib/response.js");
+const listingsrouter = require("./routes/listings.js");
+const reviewsrouter = require("./routes/review.js");
+const userrouter = require("./routes/user.js");
 
 
 const mongo_url = "mongodb://127.0.0.1:27017/wonderland";
@@ -57,16 +60,33 @@ app.get("/", (req, res) => {
 app.use(session(sessionOptions));
 app.use(flash());
 
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 app.use((req,res,next)=>{
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
     next();
 });
 
+// app.get("/demouser", async ( req,res)=>{
+//     let fakeuser = new User({
+//         email : "student@gmail.com",
+//         username : "dhara-gohil",
+//     });
 
-app.use("/listings", listings);  
-app.use("/listings/:id/reviews", reviews);
- 
+//     let registeredUser = await User.register(fakeuser,"helloji");
+//     res.send(registeredUser);
+// });
+
+
+app.use("/listings", listingsrouter);  
+app.use("/listings/:id/reviews", reviewsrouter);
+app.use("/",userrouter)
 
 // for error handling 
 app.all("*",(read,res,next)=>{
