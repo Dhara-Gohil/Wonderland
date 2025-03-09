@@ -39,11 +39,12 @@ router.get("/new", isLoggedIn, (req, res) => {
 // Show route: View a specific listing
 router.get("/:id", wrapAsync( async (req, res) => {
     const { id } = req.params;
-    const listing = await Listing.findById(id).populate("reviews");
+    const listing = await Listing.findById(id).populate("reviews").populate("owner");
     if(!listing){
         req.flash("error","Listing you requested for does not exist !");
         res.redirect("/listings");
     }
+    console.log(listing);
     res.render("listings/show", { listing });
 }));
 
@@ -53,6 +54,7 @@ router.get("/:id", wrapAsync( async (req, res) => {
 router.post("/", isLoggedIn,validatelisting , wrapAsync ( async (req, res) => { // Check the incoming data and log it
     console.log("Received listing data:", req.body.listing);// Destructure the incoming data
     const { title, description, image, price, location, country } = req.body.listing; 
+    const owner = req.user._id;
     const finalImage = (image && typeof image === 'string' && image.trim() !== '') ? image : undefined; // If image is an empty string, use the default image URL
         // Create a new listing with the processed image field
         const newListing = new Listing({
@@ -61,7 +63,8 @@ router.post("/", isLoggedIn,validatelisting , wrapAsync ( async (req, res) => { 
             image: finalImage,  // Use image string or fallback to default
             price,
             location,
-            country
+            country,
+            owner
         });
         await newListing.save();
         req.flash("success","New Listing created!")
@@ -115,7 +118,7 @@ router.put("/:id", isLoggedIn ,validatelisting, wrapAsync ( async (req, res) => 
 
 
 // Delete route
-router.delete("/:id" , isLoggedIn ,wrapAsync ( async(req,res)=>{
+router.delete("/:id" ,  wrapAsync ( async(req,res)=>{
     let {id}= req.params;
     let deletedlisting = await Listing.findByIdAndDelete(id);
     console.log(deletedlisting);
