@@ -28,10 +28,13 @@ module.exports.showListings = async (req, res) => {
 }
 
 module.exports.createNewListing = async (req, res) => { // Check the incoming data and log it
+    let url = req.file.path;
+    let filename = req.file.filename;
+    console.log(url,filename)
     console.log("Received listing data:", req.body.listing);// Destructure the incoming data
-    const { title, description, image, price, location, country } = req.body.listing; 
+    const { title, description, price, location, country } = req.body.listing; 
     const owner = req.user._id;
-    const finalImage = (image && typeof image === 'string' && image.trim() !== '') ? image : undefined; // If image is an empty string, use the default image URL
+    const finalImage = {filename,url} // If image is an empty string, use the default image URL
         // Create a new listing with the processed image field
         const newListing = new Listing({
             title,
@@ -42,6 +45,7 @@ module.exports.createNewListing = async (req, res) => { // Check the incoming da
             country,
             owner
         });
+    
         await newListing.save();
         req.flash("success","New Listing created!")
         res.redirect("/listings");
@@ -62,6 +66,12 @@ module.exports.editListing =  async (req, res) => {
 module.exports.UpdateListing =  async (req, res) => {
     const { id } = req.params;
         const updatedListing = await Listing.findByIdAndUpdate(id, req.body.listing, { new: true });
+        if ( typeof req.file !== "undefined"){
+            let url = req.file.path;
+            let filename = req.file.filename;
+            updatedListing.image = {url,filename};
+            await updatedListing.save();
+        }
         if (!updatedListing) {
             req.flash("error","Listing you requested for does not exist !");
             res.redirect("/listings");
@@ -77,3 +87,5 @@ module.exports.deleteListing = async(req,res)=>{
     req.flash("success","Listing Deleted!")
     res.redirect("/listings");
 }
+
+// (image && typeof image === 'string' && image.trim() !== '') ? image : undefined;}

@@ -1,6 +1,9 @@
 # Node modules
 node_modules/
 
+# uploads
+uploads/
+
 # Logs
 *.log
 npm-debug.log*
