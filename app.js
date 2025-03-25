@@ -57,9 +57,6 @@ const sessionOptions  = {
 };
 
 // Routes
-app.get("/", (req, res) => {
-    res.send("Welcome to Wonderland!");
-});
 
 app.use(session(sessionOptions));
 app.use(flash());
