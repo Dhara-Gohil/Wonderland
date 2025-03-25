@@ -39,7 +39,7 @@
             </div>
             <% } %>
             <div class="col-8 offset-3 mb-3">
-                <hr>
+               
                 <% if(currUser ) { %>
                 <h4>Leave a Review</h4>
                 <form action="/listings/<%= listing.id%>/reviews" method="POST" novalidate class="needs-validation">
@@ -71,7 +71,8 @@
                 </form>
                 <hr>
                 <% } %>
-                
+                <% if (listing.reviews.length > 0) { %> 
+                    <hr>
                 <p> <b>All Reviews</b> </p>
                 <div class="row">
                     <% for(review of listing.reviews) { %>
@@ -91,6 +92,7 @@
                         </div>
                         <%}%>
                 </div>
+                <% } %>
             </div>
         </div>
     </body>

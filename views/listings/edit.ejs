@@ -11,10 +11,13 @@
                         <input type="text" name="listing[title]" value="<%= listing.title %>" class="form-control" required>
                         <div class="invalid-feedback">Title should be valid</div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-3 ">
                         <label for="description" class="form-label">Description</label>
                         <textarea class="form-control" name="listing[description]" required><%= listing.description %></textarea>
                         <div class="invalid-feedback">Please enter short text</div>
+                    </div>
+                    <div class="mb-3 ">
+                        <img src="<%= originalImage %>" alt="">
                     </div>
                     <div class="mb-3">
                         <label for="image" class="form-label">Upload New Image</label>

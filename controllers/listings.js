@@ -60,7 +60,10 @@ module.exports.editListing =  async (req, res) => {
             res.redirect("/listings");
 
         }
-        res.render("listings/edit", { listing });
+
+        let originalImage = listing.image.url;
+        originalImage=originalImage.replace("/upload","/upload/w_250")
+        res.render("listings/edit", { listing,originalImage });
 }
 
 module.exports.UpdateListing =  async (req, res) => {
