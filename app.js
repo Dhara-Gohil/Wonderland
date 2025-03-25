@@ -10,6 +10,7 @@ const ejsMate = require("ejs-mate");
 const ExpressError = require("./utils/ExpressError.js");
 const app = express();
 const session = require("express-session");
+const Mongostore = require("connect-mongo");
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
@@ -20,12 +21,16 @@ const reviewsrouter = require("./routes/review.js");
 const userrouter = require("./routes/user.js");
 
 
-const mongo_url = "mongodb://127.0.0.1:27017/wonderland";
+// const mongo_url = "mongodb://127.0.0.1:27017/wonderland";
+const dbUrl = process.env.ATLASDB_URL;
+
+
 
 // Database connection
 async function main() {
-    await mongoose.connect(mongo_url);
+    await mongoose.connect(dbUrl);
     console.log("Connected to MongoDB!");
+    console.log("MongoDB URL:", process.env.ATLASDB_URL);
 }
 
 main().catch((err) => console.error(err));
@@ -45,8 +50,22 @@ app.use(methodOverride("_method")); // Override method for PUT/PATCH/DELETE
 app.engine("ejs",ejsMate);
 app.use(express.static(path.join(__dirname,"/public")));// for public
 
+
+const store = Mongostore.create({
+    mongoUrl:dbUrl,
+    crypto:{
+        secret:process.env.SECRET,
+    },
+    touchAfter:24*3600,
+})
+
+store.on("error",()=>{
+    console.log("error in mongo session store",err);
+})
+
 const sessionOptions  = {
-    secret:"mysupersecretcode",
+    store,
+    secret:process.env.SECRET,
     resave: false,
     saveUninitialized:true,  
     cookie:{
@@ -74,17 +93,6 @@ app.use((req,res,next)=>{
     res.locals.currUser = req.user;
     next();
 });
-
-// app.get("/demouser", async ( req,res)=>{
-//     let fakeuser = new User({
-//         email : "student@gmail.com",
-//         username : "dhara-gohil",
-//     });
-
-//     let registeredUser = await User.register(fakeuser,"helloji");
-//     res.send(registeredUser);
-// });
-
 
 app.use("/listings", listingsrouter);  
 app.use("/listings/:id/reviews", reviewsrouter);
