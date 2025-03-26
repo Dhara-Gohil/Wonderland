@@ -15,7 +15,7 @@ module.exports.showListings = async (req, res) => {
     .populate({
         path:"reviews",
         populate:{
-            path:"author",
+        path:"author",
         },
     })
     .populate("owner");
