@@ -1,4 +1,4 @@
-if(process.env.NODE_ENV != "production"){
+if (process.env.NODE_ENV != "production") {
     require('dotenv').config();
 }
 
@@ -20,63 +20,58 @@ const listingsrouter = require("./routes/listings.js");
 const reviewsrouter = require("./routes/review.js");
 const userrouter = require("./routes/user.js");
 
-
-// const mongo_url = "mongodb://127.0.0.1:27017/wonderland";
 const dbUrl = process.env.ATLASDB_URL;
-
-
 
 // Database connection
 async function main() {
-    await mongoose.connect(dbUrl);
-    console.log("Connected to MongoDB!");
-    console.log("MongoDB URL:", process.env.ATLASDB_URL);
+    try {
+        await mongoose.connect(dbUrl);
+        console.log("Connected to MongoDB!");
+
+        // Start server AFTER successful DB connection
+        app.listen(8080, () => {
+            console.log("Server is running on http://localhost:8080");
+        });
+
+    } catch (err) {
+        console.error("MongoDB connection error:", err);
+    }
 }
 
-main().catch((err) => console.error(err));
-
-
-// Start the server
-app.listen(8080, () => {
-    console.log("Server is running on http://localhost:8080");
-});
-
+main();
 
 // Middleware
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-app.use(express.urlencoded({ extended: true })); // Parse form data
-app.use(methodOverride("_method")); // Override method for PUT/PATCH/DELETE
-app.engine("ejs",ejsMate);
-app.use(express.static(path.join(__dirname,"/public")));// for public
+app.use(express.urlencoded({ extended: true }));
+app.use(methodOverride("_method"));
+app.engine("ejs", ejsMate);
+app.use(express.static(path.join(__dirname, "/public")));
 
-
+// Mongo session store
 const store = Mongostore.create({
-    mongoUrl:dbUrl,
-    crypto:{
-        secret:process.env.SECRET,
-    },
-    touchAfter:24*3600,
-})
+    mongoUrl: dbUrl,
+    crypto: { secret: process.env.SECRET },
+    touchAfter: 24 * 3600,
+});
 
-store.on("error",()=>{
-    console.log("error in mongo session store",err);
-})
+store.on("error", (err) => {
+    console.log("Error in Mongo session store:", err);
+});
 
-const sessionOptions  = {
+const sessionOptions = {
     store,
-    secret:process.env.SECRET,
+    secret: process.env.SECRET,
     resave: false,
-    saveUninitialized:true,  
-    cookie:{
-        expires: Date.now() + 7*24*60*60*1000,
-        maxAge:7*24*60*60*1000,
-        httpOnly:true,
+    saveUninitialized: true,
+    cookie: {
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
     }
 };
 
 // Routes
-
 app.use(session(sessionOptions));
 app.use(flash());
 
@@ -87,24 +82,28 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-app.use((req,res,next)=>{
+app.use((req, res, next) => {
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
     res.locals.currUser = req.user;
     next();
 });
 
-app.use("/listings", listingsrouter);  
-app.use("/listings/:id/reviews", reviewsrouter);
-app.use("/",userrouter)
-
-// for error handling 
-app.all("*",(read,res,next)=>{
-    next(new ExpressError(404,"page not found!"));
+// Redirect root ("/") to home page
+app.get("/", (req, res) => {
+    res.redirect("/listings");
 });
 
-app.use((err,req,res,next)=>{
-   let {statusCode=500 , message="Something went wrong" } = err;
-   res.status(statusCode).render("error.ejs",{message});
-    // res.status(statusCode),res.send(message);
+app.use("/listings", listingsrouter);
+app.use("/listings/:id/reviews", reviewsrouter);
+app.use("/", userrouter);
+
+// Error handling
+app.all("*", (req, res, next) => {
+    next(new ExpressError(404, "Page not found!"));
+});
+
+app.use((err, req, res, next) => {
+    let { statusCode = 500, message = "Something went wrong" } = err;
+    res.status(statusCode).render("error.ejs", { message });
 });
