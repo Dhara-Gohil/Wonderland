@@ -9,23 +9,43 @@ module.exports.renderNewForm = (req, res) => {
     res.render("listings/new");
 }
 
+// module.exports.showListings = async (req, res) => {
+//     const { id } = req.params;
+//     const listing = await Listing.findById(id)
+//     .populate({
+//         path:"reviews",
+//         populate:{
+//         path:"author",
+//         },
+//     })
+//     .populate("owner");
+//     if(!listing){
+//         req.flash("error","Listing you requested for does not exist !");
+//         res.redirect("/listings");
+//     }
+//     console.log(listing);
+//     res.render("listings/show", { listing });
+// }
+
 module.exports.showListings = async (req, res) => {
     const { id } = req.params;
     const listing = await Listing.findById(id)
-    .populate({
-        path:"reviews",
-        populate:{
-        path:"author",
-        },
-    })
-    .populate("owner");
-    if(!listing){
-        req.flash("error","Listing you requested for does not exist !");
-        res.redirect("/listings");
+        .populate({
+            path: "reviews",
+            populate: { path: "author" },
+        })
+        .populate("owner");
+
+    if (!listing) {
+        req.flash("error", "Listing you requested for does not exist!");
+        return res.redirect("/listings");
     }
-    console.log(listing);
+
+    console.log("Listing Details from DB:", listing);  // 👈 Debugging ke liye console log
+
     res.render("listings/show", { listing });
-}
+};
+
 
 module.exports.createNewListing = async (req, res) => { // Check the incoming data and log it
     let url = req.file.path;
