@@ -47,7 +47,7 @@ Feel free to contribute! Submit a pull request or open an issue if you find any 
 ![Screenshot](Screenshots/SignIn.png)
 
 ### Login Page
-![Screenshot](Screenshots/Login_vali.png)
+![Screenshot](Screenshots/login.png)
 
 ### HomePage Before login
 ![Screenshot](Screenshots/HPwithoutLogin.png)
