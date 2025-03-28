@@ -1,6 +1,6 @@
 # Wonderland
 
-Welcome to **Wonderland**, a project designed to [briefly describe the purpose of the project].
+Welcome to **Wonderland**, a project designed to property booking and listing with a user-friendly design. Built for efficiency, accessibility, and a smooth user experience.
 
 ## Features
 - User authentication (Sign In & Login)
