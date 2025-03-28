@@ -2,6 +2,13 @@
 
 Welcome to **Wonderland**, a project designed to [briefly describe the purpose of the project].
 
+## Features
+- User authentication (Sign In & Login)
+- Add, update, and delete listings (Only the owner of the listing can edit or delete it)
+- Show listing details
+- Review system (Users can add reviews only after logging in, and only the review author can delete their review)
+- Implements MVC (Model-View-Controller) structure
+
 ## Technologies Used
 - **Frontend:** HTML, CSS, JavaScript, EJS
 - **Backend:** Node.js, Express.js
@@ -35,8 +42,30 @@ Welcome to **Wonderland**, a project designed to [briefly describe the purpose o
 Feel free to contribute! Submit a pull request or open an issue if you find any bugs or have feature suggestions.
 
 ## Screenshots
-![Homepage](screenshots/homepage.png)
-![Dashboard](screenshots/dashboard.png)
+
+### SignIn page
+![Screenshot](Screenshots/SignIn.png)
+
+### Login Page
+![Screenshot](Screenshots/Login_vali.png)
+
+### HomePage Before login
+![Screenshot](Screenshots/HPwithoutLogin.png)
+
+### Homepage After login
+![Screenshot](Screenshots/HPafterLogin.png)
+
+### Add_Listing page
+![Screenshot](Screenshots/Add_listing.png)
+
+### Show_Listing page
+![Screenshot](Screenshots/Show_listing.png)
+
+### Review feature
+![Screenshot](Screenshots/Review.png)
+
+### Update page
+![Screenshot](Screenshots/Updatepage.png)
 
 Happy Coding! 🎉
 
