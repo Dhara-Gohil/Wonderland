@@ -1,4 +1,4 @@
-# Wonderland Project
+# Wonderland
 
 Welcome to **Wonderland**, a project designed to [briefly describe the purpose of the project].
 
@@ -33,6 +33,10 @@ Welcome to **Wonderland**, a project designed to [briefly describe the purpose o
 
 ## Contribution
 Feel free to contribute! Submit a pull request or open an issue if you find any bugs or have feature suggestions.
+
+## Screenshots
+![Homepage](screenshots/homepage.png)
+![Dashboard](screenshots/dashboard.png)
 
 Happy Coding! 🎉
 
